@@ -1,6 +1,7 @@
 import { PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
 
 import { Classroom, ClassroomItem } from '@/components/ClassroomItem';
 import { ConfettiBackground } from '@/components/Confetti';
@@ -18,9 +19,9 @@ import bananaCatCryingImage from '../../assets/banana-cat-crying.gif';
 import './App.css';
 
 const MOCKED_RECENT_CLASSROOMS: Classroom[] = [
-  { name: '301동 403호' },
-  { name: '301동 404호' },
-  { name: '301동 501호' },
+  { id: 1, name: '301동 403호' },
+  { id: 2, name: '301동 404호' },
+  { id: 3, name: '301동 501호' },
 ];
 
 const Main: React.FC = () => {
@@ -36,6 +37,17 @@ const Main: React.FC = () => {
 
   const [isSearchClassroomDrawerOpen, setSearchClassroomDrawerOpen] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('beacon-error', (err) => {
+      toast.error(err as string);
+    });
+    window.electron.ipcRenderer.sendMessage(
+      'toggle-beacon',
+      isCurrentBeaconOn,
+      currentClassroom,
+    );
+  }, [isCurrentBeaconOn, currentClassroom]);
 
   useEffect(() => {
     if (!currentClassroom) {
@@ -209,10 +221,25 @@ const Main: React.FC = () => {
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Main />} />
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Main />} />
+        </Routes>
+      </Router>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+    </>
   );
 }

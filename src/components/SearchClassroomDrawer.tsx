@@ -4,7 +4,6 @@ import { Classroom, ClassroomItem } from '@/components/ClassroomItem';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -82,15 +81,13 @@ export const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
         </div>
 
         <DrawerFooter>
-          <DrawerClose>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => setOpen(false)}
-            >
-              취소
-            </Button>
-          </DrawerClose>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => setOpen(false)}
+          >
+            취소
+          </Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

@@ -3,6 +3,7 @@ import { CheckIcon, GraduationCapIcon } from 'lucide-react';
 import { cn } from '@/utils';
 
 export type Classroom = {
+  id: number;
   name: string;
 };
 export type ClassroomItemProps = Classroom & {

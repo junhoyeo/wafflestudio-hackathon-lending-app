@@ -6,7 +6,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { BrowserWindow, app, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
@@ -28,6 +28,43 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+const bleno = require('@abandonware/bleno');
+
+// Function to handle BLE operations
+type Classroom = {
+  id: number;
+  name: string;
+};
+function handleBeaconOperation(isBeaconOn: boolean, classroom: Classroom) {
+  if (isBeaconOn && classroom) {
+    const uuid = 'e2c56db5dffb48d2b060d0f5a71096e0';
+    const major = 0;
+    const minor = classroom.id; // Ensure this is a number
+    const measuredPower = -59;
+    bleno.startAdvertisingIBeacon(uuid, major, minor, measuredPower);
+    console.log('Beacon on');
+  } else {
+    bleno.stopAdvertising();
+    console.log('Beacon off');
+  }
+}
+
+// Listen for IPC messages from the renderer process
+ipcMain.on('toggle-beacon', (event, isBeaconOn, classroom) => {
+  try {
+    handleBeaconOperation(isBeaconOn, classroom);
+  } catch (e) {
+    // alert with electron dialog
+    console.error(e);
+    // dialog.showErrorBox(
+    //   'Beacon operation failed',
+    //   (e as Error).message || 'Unknown error',
+    // );
+    // send error to renderer process
+    event.reply('beacon-error', (e as Error).message || 'Unknown error');
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
