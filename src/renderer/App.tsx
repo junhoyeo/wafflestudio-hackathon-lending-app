@@ -1,5 +1,5 @@
 import { CrossIcon, PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 
 import { Classroom, ClassroomItem } from '@/components/ClassroomItem';
@@ -7,6 +7,17 @@ import { ConfettiBackground } from '@/components/Confetti';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
@@ -15,13 +26,89 @@ import bananaCatBreathingImage from '../../assets/banana-cat-breathing.gif';
 import bananaCatCryingImage from '../../assets/banana-cat-crying.gif';
 import './App.css';
 
+type SearchClassroomDrawerProps = {
+  currentClassroom?: Classroom | null;
+  classrooms: Classroom[];
+  onSelectClassroom: (value: Classroom) => void;
+};
+const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
+  currentClassroom,
+  classrooms,
+  onSelectClassroom,
+}) => {
+  const [open, setOpen] = useState<boolean>(false);
+  const [query, setQuery] = useState<string>('');
+
+  const filteredClassrooms = useMemo(
+    () => classrooms.filter((item) => item.name.includes(query)),
+    [classrooms, query],
+  );
+
+  return (
+    <Drawer>
+      <DrawerTrigger>
+        <Button>강의실 찾기</Button>
+      </DrawerTrigger>
+      <DrawerContent className="w-full max-w-[500px] mx-auto">
+        <DrawerHeader>
+          <DrawerTitle>강의실 검색</DrawerTitle>
+          <DrawerDescription>이런 강의실이 있었넹~!</DrawerDescription>
+        </DrawerHeader>
+
+        <div className="flex flex-col gap-4 p-4 pb-0">
+          <Input
+            autoFocus
+            className="text-lg bg-slate-100"
+            placeholder="검색하세여"
+            value={query}
+            onChange={(e) => setQuery(e.target.value.trim())}
+          />
+
+          <ul className="flex flex-col gap-1">
+            {filteredClassrooms.map((item, idx) => (
+              <ClassroomItem
+                key={idx}
+                {...item}
+                selected={item.name === currentClassroom?.name}
+                onClick={() => onSelectClassroom(item)}
+              />
+            ))}
+
+            {filteredClassrooms.length === 0 && (
+              <div className="flex flex-col items-center justify-center w-full gap-3 py-6 rounded-lg bg-slate-100">
+                <img
+                  className="w-[156px] h-[156px] rounded-md"
+                  alt="icon"
+                  src={bananaCatCryingImage}
+                />
+
+                <h3 className="font-medium text-slate-700">
+                  그런 강의실은 없는데요;
+                </h3>
+              </div>
+            )}
+          </ul>
+        </div>
+
+        <DrawerFooter>
+          <DrawerClose>
+            <Button variant="outline" className="w-full">
+              취소
+            </Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
 const MOCKED_RECENT_CLASSROOMS: Classroom[] = [
   { name: '301동 403호' },
   { name: '301동 404호' },
   { name: '301동 501호' },
 ];
 
-function Hello() {
+const Main: React.FC = () => {
   const [isCurrentBeaconOn, setCurrentBeaconOn] = useState<boolean>(false);
   const [currentClassroom, setCurrentClassroom] = useState<Classroom | null>(
     // { name: '301동 403호' },
@@ -106,7 +193,10 @@ function Hello() {
               <h3 className="font-medium text-slate-700">
                 먼저 강의실을 선택해주세요!
               </h3>
-              {/* <Button>검색하기</Button> */}
+              <SearchClassroomDrawer
+                classrooms={MOCKED_RECENT_CLASSROOMS}
+                onSelectClassroom={setCurrentClassroom}
+              />
             </div>
           )}
         </CardContent>
@@ -123,9 +213,7 @@ function Hello() {
                 key={idx}
                 {...item}
                 selected={item.name === currentClassroom?.name}
-                onClick={() => {
-                  setCurrentClassroom(item);
-                }}
+                onClick={() => setCurrentClassroom(item)}
               />
             ))}
           </ul>
@@ -133,13 +221,13 @@ function Hello() {
       </Card>
     </div>
   );
-}
+};
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<Main />} />
       </Routes>
     </Router>
   );
