@@ -63,6 +63,11 @@ const configuration: webpack.Configuration = {
   module: {
     rules: [
       {
+        test: /\.css$/,
+        include: [webpackPaths.srcRendererPath],
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
+      },
+      {
         test: /\.s?(c|a)ss$/,
         use: [
           'style-loader',
