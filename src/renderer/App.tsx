@@ -95,7 +95,11 @@ const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
 
         <DrawerFooter>
           <DrawerClose>
-            <Button variant="outline" className="w-full">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setOpen(false)}
+            >
               취소
             </Button>
           </DrawerClose>
@@ -165,12 +169,14 @@ const Main: React.FC = () => {
 
                   {isCurrentBeaconOn ? (
                     <span>
-                      (현재 비컨이 <span className="font-bold">켜져</span>{' '}
+                      (현재 비컨이{' '}
+                      <span className="font-bold text-pink-500">켜져</span>{' '}
                       있어요.)
                     </span>
                   ) : (
                     <span>
-                      (현재 비컨이 <span className="font-bold">꺼져</span>{' '}
+                      (현재 비컨이{' '}
+                      <span className="font-bold text-pink-500">꺼져</span>{' '}
                       있어요.)
                     </span>
                   )}
@@ -197,7 +203,8 @@ const Main: React.FC = () => {
             <div className="flex flex-col items-center justify-center w-full gap-3 py-6 rounded-lg bg-slate-100">
               <SearchXIcon size={32} className="text-slate-700" />
               <h3 className="font-medium text-slate-700">
-                먼저 강의실을 선택해주세요!
+                먼저 강의실을 <span className="text-pink-500">선택</span>
+                해주세요!
               </h3>
               <Button onClick={() => setSearchClassroomDrawerOpen(true)}>
                 강의실 찾기
