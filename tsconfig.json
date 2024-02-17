@@ -18,5 +18,6 @@
       "@/*": ["./*"]
     }
   },
+  "include": ["**/*"],
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
 }

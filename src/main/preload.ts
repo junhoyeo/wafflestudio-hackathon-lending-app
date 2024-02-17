@@ -1,5 +1,5 @@
 // Disable no-unused-vars, broken for spread args
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron';
 
 export type Channels = 'ipc-example';
 
