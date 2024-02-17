@@ -6,7 +6,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { BrowserWindow, app, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
@@ -53,7 +53,16 @@ function handleBeaconOperation(isBeaconOn: boolean, classroom: Classroom) {
 
 // Listen for IPC messages from the renderer process
 ipcMain.on('toggle-beacon', (event, isBeaconOn, classroom) => {
-  handleBeaconOperation(isBeaconOn, classroom);
+  try {
+    handleBeaconOperation(isBeaconOn, classroom);
+  } catch (e) {
+    // alert with electron dialog
+    console.error(e);
+    dialog.showErrorBox(
+      'Beacon operation failed',
+      (e as Error).message || 'Unknown error',
+    );
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
