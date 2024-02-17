@@ -5,6 +5,7 @@ import { cn } from '@/utils';
 import { Badge } from './ui/badge';
 
 export type Classroom = {
+  id: number;
   name: string;
 };
 export type ClassroomItemProps = Classroom & {

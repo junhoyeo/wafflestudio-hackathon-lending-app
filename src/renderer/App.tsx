@@ -106,9 +106,9 @@ const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
 };
 
 const MOCKED_RECENT_CLASSROOMS: Classroom[] = [
-  { name: '301동 403호' },
-  { name: '301동 404호' },
-  { name: '301동 501호' },
+  { id: 1, name: '301동 403호' },
+  { id: 2, name: '301동 404호' },
+  { id: 3, name: '301동 501호' },
 ];
 
 const Main: React.FC = () => {
