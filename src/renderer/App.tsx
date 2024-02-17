@@ -1,10 +1,11 @@
-import { PowerIcon, SearchXIcon } from 'lucide-react';
+import { CrossIcon, PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 
 import { Classroom, ClassroomItem } from '@/components/ClassroomItem';
 import { ConfettiBackground } from '@/components/Confetti';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -23,8 +24,8 @@ const MOCKED_RECENT_CLASSROOMS: Classroom[] = [
 function Hello() {
   const [isCurrentBeaconOn, setCurrentBeaconOn] = useState<boolean>(false);
   const [currentClassroom, setCurrentClassroom] = useState<Classroom | null>(
-    // null,
-    { name: '301동 403호' },
+    // { name: '301동 403호' },
+    null,
   );
   const [recentClassrooms] = useState<Classroom[]>(MOCKED_RECENT_CLASSROOMS);
 
@@ -43,7 +44,16 @@ function Hello() {
                 <div className="flex flex-col items-center justify-center gap-2">
                   <div className="flex flex-col items-center gap-2">
                     <Badge className="w-fit">현재 강의실</Badge>
-                    <ClassroomItem {...currentClassroom} />
+                    <span className="flex items-center gap-1">
+                      <ClassroomItem {...currentClassroom} />
+                      <Button
+                        variant="ghost"
+                        className="p-0 w-[32px] h-[32px]"
+                        onClick={() => setCurrentClassroom(null)}
+                      >
+                        <XIcon size={16} />
+                      </Button>
+                    </span>
                   </div>
 
                   {isCurrentBeaconOn ? (
@@ -91,9 +101,12 @@ function Hello() {
             </div>
           )}
           {!currentClassroom && (
-            <div>
-              <SearchXIcon />
-              <h3>강의실을 선택해주세요!</h3>
+            <div className="flex flex-col items-center justify-center w-full gap-3 py-6 rounded-lg bg-slate-100">
+              <SearchXIcon size={32} className="text-slate-700" />
+              <h3 className="font-medium text-slate-700">
+                먼저 강의실을 선택해주세요!
+              </h3>
+              {/* <Button>검색하기</Button> */}
             </div>
           )}
         </CardContent>
