@@ -30,6 +30,32 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
+const bleno = require('@abandonware/bleno');
+
+// Function to handle BLE operations
+type Classroom = {
+  id: number;
+  name: string;
+};
+function handleBeaconOperation(isBeaconOn: boolean, classroom: Classroom) {
+  if (isBeaconOn && classroom) {
+    const uuid = 'e2c56db5dffb48d2b060d0f5a71096e0';
+    const major = 0;
+    const minor = classroom.id; // Ensure this is a number
+    const measuredPower = -59;
+    bleno.startAdvertisingIBeacon(uuid, major, minor, measuredPower);
+    console.log('Beacon on');
+  } else {
+    bleno.stopAdvertising();
+    console.log('Beacon off');
+  }
+}
+
+// Listen for IPC messages from the renderer process
+ipcMain.on('toggle-beacon', (event, isBeaconOn, classroom) => {
+  handleBeaconOperation(isBeaconOn, classroom);
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
