@@ -64,7 +64,7 @@ function Hello() {
     const confettiSettings = {
       target: 'confetti',
       max: 30,
-      size: 3.5,
+      size: 3,
       animate: true,
       props: ['square'],
       colors: [
@@ -93,6 +93,10 @@ function Hello() {
       let confettiOpacity = 0.1;
       confettiIntervalID = setInterval(function () {
         confettiCanvas.style.opacity = confettiOpacity.toString();
+
+        if (confettiOpacity >= 0.8) {
+          clearInterval(confettiIntervalID);
+        }
         confettiOpacity += 0.07;
       }, 100);
     } else {
