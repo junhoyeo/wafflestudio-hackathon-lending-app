@@ -1,3 +1,4 @@
+import bleno from '@abandonware/bleno';
 import { PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
@@ -111,6 +112,20 @@ const MOCKED_RECENT_CLASSROOMS: Classroom[] = [
   { id: 3, name: '301동 501호' },
 ];
 
+function HandleBeacon(isCurrentBeaconOn: boolean, classroom: Classroom | null) {
+  if (isCurrentBeaconOn && classroom !== null) {
+    const uuid = 'e2c56db5dffb48d2b060d0f5a71096e0';
+    const major = 0;
+    const minor = classroom.id;
+    const measuredPower = -59;
+    bleno.startAdvertisingIBeacon(uuid, major, minor, measuredPower);
+    console.log('beacon on');
+  } else {
+    bleno.stopAdvertising();
+    console.log('beacon off');
+  }
+}
+
 const Main: React.FC = () => {
   const [isCurrentBeaconOn, setCurrentBeaconOn] = useState<boolean>(false);
   const [currentClassroom, setCurrentClassroom] = useState<Classroom | null>(
@@ -121,6 +136,8 @@ const Main: React.FC = () => {
 
   const [isSearchClassroomDrawerOpen, setSearchClassroomDrawerOpen] =
     useState<boolean>(false);
+
+  HandleBeacon(isCurrentBeaconOn, currentClassroom);
 
   return (
     <div className="flex flex-col gap-2 px-4 py-6 max-w-[500px] mx-auto">
