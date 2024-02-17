@@ -1,5 +1,5 @@
-import { CrossIcon, PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 
 import { Classroom, ClassroomItem } from '@/components/ClassroomItem';
@@ -15,7 +15,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,13 +29,18 @@ type SearchClassroomDrawerProps = {
   currentClassroom?: Classroom | null;
   classrooms: Classroom[];
   onSelectClassroom: (value: Classroom) => void;
+  trigger?: React.ReactNode;
+  open: boolean;
+  setOpen: (value: boolean) => void;
 };
 const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
   currentClassroom,
   classrooms,
   onSelectClassroom,
+  trigger,
+  open,
+  setOpen,
 }) => {
-  const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
 
   const filteredClassrooms = useMemo(
@@ -45,10 +49,7 @@ const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
   );
 
   return (
-    <Drawer>
-      <DrawerTrigger>
-        <Button>강의실 찾기</Button>
-      </DrawerTrigger>
+    <Drawer open={open} onClose={() => setOpen(false)}>
       <DrawerContent className="w-full max-w-[500px] mx-auto">
         <DrawerHeader>
           <DrawerTitle>강의실 검색</DrawerTitle>
@@ -70,7 +71,9 @@ const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
                 key={idx}
                 {...item}
                 selected={item.name === currentClassroom?.name}
-                onClick={() => onSelectClassroom(item)}
+                onClick={() => {
+                  onSelectClassroom(item);
+                }}
               />
             ))}
 
@@ -115,6 +118,9 @@ const Main: React.FC = () => {
     null,
   );
   const [recentClassrooms] = useState<Classroom[]>(MOCKED_RECENT_CLASSROOMS);
+
+  const [isSearchClassroomDrawerOpen, setSearchClassroomDrawerOpen] =
+    useState<boolean>(false);
 
   return (
     <div className="flex flex-col gap-2 px-4 py-6 max-w-[500px] mx-auto">
@@ -193,10 +199,9 @@ const Main: React.FC = () => {
               <h3 className="font-medium text-slate-700">
                 먼저 강의실을 선택해주세요!
               </h3>
-              <SearchClassroomDrawer
-                classrooms={MOCKED_RECENT_CLASSROOMS}
-                onSelectClassroom={setCurrentClassroom}
-              />
+              <Button onClick={() => setSearchClassroomDrawerOpen(true)}>
+                강의실 찾기
+              </Button>
             </div>
           )}
         </CardContent>
@@ -206,7 +211,7 @@ const Main: React.FC = () => {
         <CardHeader>
           <CardTitle>최근 강의실 목록</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-2">
           <ul className="flex flex-col gap-1">
             {recentClassrooms.map((item, idx) => (
               <ClassroomItem
@@ -217,8 +222,27 @@ const Main: React.FC = () => {
               />
             ))}
           </ul>
+          {!!currentClassroom && (
+            <Button
+              className="w-full"
+              onClick={() => setSearchClassroomDrawerOpen(true)}
+            >
+              강의실 검색하기
+            </Button>
+          )}
         </CardContent>
       </Card>
+
+      <SearchClassroomDrawer
+        open={isSearchClassroomDrawerOpen}
+        setOpen={setSearchClassroomDrawerOpen}
+        currentClassroom={currentClassroom}
+        classrooms={MOCKED_RECENT_CLASSROOMS}
+        onSelectClassroom={(v) => {
+          setCurrentClassroom(v);
+          setSearchClassroomDrawerOpen(false);
+        }}
+      />
     </div>
   );
 };
