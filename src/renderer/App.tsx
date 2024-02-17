@@ -1,23 +1,14 @@
 import bleno from '@abandonware/bleno';
 import { PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 
 import { Classroom, ClassroomItem } from '@/components/ClassroomItem';
 import { ConfettiBackground } from '@/components/Confetti';
+import { SearchClassroomDrawer } from '@/components/SearchClassroomDrawer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
@@ -25,86 +16,6 @@ import { Switch } from '@/components/ui/switch';
 import bananaCatBreathingImage from '../../assets/banana-cat-breathing.gif';
 import bananaCatCryingImage from '../../assets/banana-cat-crying.gif';
 import './App.css';
-
-type SearchClassroomDrawerProps = {
-  currentClassroom?: Classroom | null;
-  classrooms: Classroom[];
-  onSelectClassroom: (value: Classroom) => void;
-  trigger?: React.ReactNode;
-  open: boolean;
-  setOpen: (value: boolean) => void;
-};
-const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
-  currentClassroom,
-  classrooms,
-  onSelectClassroom,
-  trigger,
-  open,
-  setOpen,
-}) => {
-  const [query, setQuery] = useState<string>('');
-
-  const filteredClassrooms = useMemo(
-    () => classrooms.filter((item) => item.name.includes(query)),
-    [classrooms, query],
-  );
-
-  return (
-    <Drawer open={open} onClose={() => setOpen(false)}>
-      <DrawerContent className="w-full max-w-[500px] mx-auto">
-        <DrawerHeader>
-          <DrawerTitle>강의실 검색</DrawerTitle>
-          <DrawerDescription>이런 강의실이 있었넹~!</DrawerDescription>
-        </DrawerHeader>
-
-        <div className="flex flex-col gap-4 p-4 pb-0">
-          <Input
-            autoFocus
-            className="text-lg bg-slate-100"
-            placeholder="검색하세여"
-            value={query}
-            onChange={(e) => setQuery(e.target.value.trim())}
-          />
-
-          <ul className="flex flex-col gap-1">
-            {filteredClassrooms.map((item, idx) => (
-              <ClassroomItem
-                key={idx}
-                {...item}
-                selected={item.name === currentClassroom?.name}
-                onClick={() => {
-                  onSelectClassroom(item);
-                }}
-              />
-            ))}
-
-            {filteredClassrooms.length === 0 && (
-              <div className="flex flex-col items-center justify-center w-full gap-3 py-6 rounded-lg bg-slate-100">
-                <img
-                  className="w-[156px] h-[156px] rounded-md"
-                  alt="icon"
-                  src={bananaCatCryingImage}
-                />
-
-                <h3 className="font-medium text-slate-700">
-                  그런 강의실은 없는데요;
-                </h3>
-              </div>
-            )}
-          </ul>
-        </div>
-
-        <DrawerFooter>
-          <DrawerClose>
-            <Button variant="outline" className="w-full">
-              취소
-            </Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
-  );
-};
 
 const MOCKED_RECENT_CLASSROOMS: Classroom[] = [
   { id: 1, name: '301동 403호' },
@@ -182,12 +93,14 @@ const Main: React.FC = () => {
 
                   {isCurrentBeaconOn ? (
                     <span>
-                      (현재 비컨이 <span className="font-bold">켜져</span>{' '}
+                      (현재 비컨이{' '}
+                      <span className="font-bold text-pink-500">켜져</span>{' '}
                       있어요.)
                     </span>
                   ) : (
                     <span>
-                      (현재 비컨이 <span className="font-bold">꺼져</span>{' '}
+                      (현재 비컨이{' '}
+                      <span className="font-bold text-pink-500">꺼져</span>{' '}
                       있어요.)
                     </span>
                   )}
@@ -204,6 +117,7 @@ const Main: React.FC = () => {
                 </Label>
                 <Switch
                   id="beacon-toggle"
+                  className="data-[state=checked]:bg-pink-500"
                   onCheckedChange={() => setCurrentBeaconOn((p) => !p)}
                 />
                 <Label htmlFor="beacon-toggle"></Label>
@@ -214,7 +128,8 @@ const Main: React.FC = () => {
             <div className="flex flex-col items-center justify-center w-full gap-3 py-6 rounded-lg bg-slate-100">
               <SearchXIcon size={32} className="text-slate-700" />
               <h3 className="font-medium text-slate-700">
-                먼저 강의실을 선택해주세요!
+                먼저 강의실을 <span className="text-pink-500">선택</span>
+                해주세요!
               </h3>
               <Button onClick={() => setSearchClassroomDrawerOpen(true)}>
                 강의실 찾기
