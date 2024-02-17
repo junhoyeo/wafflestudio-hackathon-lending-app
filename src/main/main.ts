@@ -37,8 +37,11 @@ type Classroom = {
   id: number;
   name: string;
 };
-function handleBeaconOperation(isBeaconOn: boolean, classroom: Classroom) {
-  if (isBeaconOn && classroom) {
+function handleBeaconOperation(
+  beaconShouldChangedOn: boolean,
+  classroom: Classroom,
+) {
+  if (beaconShouldChangedOn && classroom) {
     const uuid = 'e2c56db5dffb48d2b060d0f5a71096e0';
     const major = 0;
     const minor = classroom.id; // Ensure this is a number
@@ -55,6 +58,10 @@ function handleBeaconOperation(isBeaconOn: boolean, classroom: Classroom) {
 ipcMain.on('toggle-beacon', (event, isBeaconOn, classroom) => {
   try {
     handleBeaconOperation(isBeaconOn, classroom);
+    event.reply('beacon-result', {
+      type: 'success',
+      message: isBeaconOn ? 'Beacon turned on' : 'Beacon turned off',
+    });
   } catch (e) {
     // alert with electron dialog
     console.error(e);
@@ -63,7 +70,10 @@ ipcMain.on('toggle-beacon', (event, isBeaconOn, classroom) => {
     //   (e as Error).message || 'Unknown error',
     // );
     // send error to renderer process
-    event.reply('beacon-error', (e as Error).message || 'Unknown error');
+    event.reply('beacon-result', {
+      type: 'error',
+      message: (e as Error).message || 'Unknown error',
+    });
   }
 });
 

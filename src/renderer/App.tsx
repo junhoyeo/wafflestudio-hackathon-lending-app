@@ -39,17 +39,6 @@ const Main: React.FC = () => {
     useState<boolean>(false);
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('beacon-error', (err) => {
-      toast.error(err as string);
-    });
-    window.electron.ipcRenderer.sendMessage(
-      'toggle-beacon',
-      isCurrentBeaconOn,
-      currentClassroom,
-    );
-  }, [isCurrentBeaconOn, currentClassroom]);
-
-  useEffect(() => {
     if (!currentClassroom) {
       setCurrentBeaconOn(false);
     }
@@ -134,7 +123,29 @@ const Main: React.FC = () => {
                   id="beacon-toggle"
                   className="data-[state=checked]:bg-pink-500"
                   onCheckedChange={() => {
-                    setCurrentBeaconOn((prev) => !prev);
+                    console.log('toggle-beacon', {
+                      isCurrentBeaconOn,
+                      currentClassroom,
+                    });
+                    window.electron.ipcRenderer.on('beacon-result', (res) => {
+                      const result = res as {
+                        type: 'success' | 'error';
+                        message: string;
+                      };
+                      console.log(result);
+                      if (result.type === 'success') {
+                        toast.success(result.message);
+                        setCurrentBeaconOn((prev) => !prev);
+                      } else {
+                        toast.error(result.message);
+                      }
+                    });
+                    const nextState = !isCurrentBeaconOn;
+                    window.electron.ipcRenderer.sendMessage(
+                      'toggle-beacon',
+                      nextState, // should be (!prev)
+                      currentClassroom,
+                    );
                   }}
                 />
                 <Label htmlFor="beacon-toggle"></Label>
@@ -229,7 +240,7 @@ export default function App() {
       </Router>
       <ToastContainer
         position="top-center"
-        autoClose={5000}
+        autoClose={2_000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
