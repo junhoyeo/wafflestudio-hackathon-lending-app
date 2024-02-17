@@ -1,10 +1,12 @@
+import ConfettiGenerator from 'confetti-js';
+
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GraduationCapIcon, PowerIcon } from 'lucide-react';
+import { GraduationCapIcon, PowerIcon, SearchXIcon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/utils';
 import { Separator } from '@/components/ui/separator';
 
@@ -17,11 +19,13 @@ type Classroom = {
 };
 type ClassroomItemProps = Classroom & {
   className?: string;
+  selected?: boolean;
   onClick?: () => void;
 };
 export const ClassroomItem: React.FC<ClassroomItemProps> = ({
   className,
   name,
+  selected,
   onClick,
 }) => {
   return (
@@ -37,6 +41,7 @@ export const ClassroomItem: React.FC<ClassroomItemProps> = ({
     >
       <GraduationCapIcon className="text-slate-700" size={18} />
       <span className="font-medium tracking-tight text-slate-700">{name}</span>
+      {selected && <Badge>선택됨</Badge>}
     </li>
   );
 };
@@ -55,16 +60,67 @@ function Hello() {
   );
   const [recentClassrooms] = useState<Classroom[]>(MOCKED_RECENT_CLASSROOMS);
 
+  useEffect(() => {
+    const confettiSettings = {
+      target: 'confetti',
+      max: 30,
+      size: 3.5,
+      animate: true,
+      props: ['square'],
+      colors: [
+        [255, 201, 0],
+        [230, 61, 135],
+        [0, 199, 228],
+        [253, 214, 126],
+      ],
+      clock: 40,
+      rotate: false,
+      width: 1400,
+    };
+
+    const confettiCanvas = document.getElementById('confetti');
+    if (!confettiCanvas) {
+      return;
+    }
+
+    confettiCanvas.style.opacity = '0.1';
+    const confetti = new ConfettiGenerator(confettiSettings);
+
+    let confettiIntervalID: NodeJS.Timeout;
+    if (isCurrentBeaconOn) {
+      confetti.render();
+
+      let confettiOpacity = 0.1;
+      confettiIntervalID = setInterval(function () {
+        confettiCanvas.style.opacity = confettiOpacity.toString();
+        confettiOpacity += 0.07;
+      }, 100);
+    } else {
+      confetti.clear();
+    }
+
+    return () => {
+      if (confettiIntervalID) {
+        clearInterval(confettiIntervalID);
+      }
+      confetti.clear();
+    };
+  }, [isCurrentBeaconOn]);
+
   return (
-    <div className="flex flex-col gap-2 px-4">
-      <Card>
+    <div className="flex flex-col gap-2 px-4 py-6 max-w-[500px] mx-auto">
+      <Card className="relative z-0">
         <CardHeader>
           <CardTitle>현황</CardTitle>
         </CardHeader>
 
         <CardContent>
-          <div className="flex flex-col gap-3">
-            {currentClassroom && (
+          <canvas
+            id="confetti"
+            className="absolute top-0 bottom-0 left-0 right-0 w-full h-full -z-10"
+          />
+          {currentClassroom && (
+            <div className="flex flex-col gap-3">
               <>
                 <div className="flex flex-col items-center justify-center gap-2">
                   <div className="flex flex-col items-center gap-2">
@@ -100,22 +156,28 @@ function Hello() {
                 </div>
                 <Separator />
               </>
-            )}
 
-            <div className="flex items-center justify-center space-x-2">
-              <Label>
-                <span className="flex items-center gap-2">
-                  <PowerIcon size={18} />
-                  <span>전원</span>
-                </span>
-              </Label>
-              <Switch
-                id="beacon-toggle"
-                onCheckedChange={() => setCurrentBeaconOn((p) => !p)}
-              />
-              <Label htmlFor="beacon-toggle"></Label>
+              <div className="flex items-center justify-center space-x-2">
+                <Label>
+                  <span className="flex items-center gap-2">
+                    <PowerIcon size={18} />
+                    <span>전원</span>
+                  </span>
+                </Label>
+                <Switch
+                  id="beacon-toggle"
+                  onCheckedChange={() => setCurrentBeaconOn((p) => !p)}
+                />
+                <Label htmlFor="beacon-toggle"></Label>
+              </div>
             </div>
-          </div>
+          )}
+          {!currentClassroom && (
+            <div>
+              <SearchXIcon />
+              <h3>강의실을 선택해주세요!</h3>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -129,6 +191,7 @@ function Hello() {
               <ClassroomItem
                 key={idx}
                 {...item}
+                selected={item.name === currentClassroom?.name}
                 onClick={() => {
                   setCurrentClassroom(item);
                 }}
