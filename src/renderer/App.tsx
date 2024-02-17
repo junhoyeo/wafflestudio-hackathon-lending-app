@@ -1,5 +1,5 @@
 import { PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 
 import { Classroom, ClassroomItem } from '@/components/ClassroomItem';
@@ -36,6 +36,12 @@ const Main: React.FC = () => {
 
   const [isSearchClassroomDrawerOpen, setSearchClassroomDrawerOpen] =
     useState<boolean>(false);
+
+  useEffect(() => {
+    if (!currentClassroom) {
+      setCurrentBeaconOn(false);
+    }
+  }, [currentClassroom]);
 
   const changeCurrentClassroom = useCallback(
     (classroom: Classroom) => {
