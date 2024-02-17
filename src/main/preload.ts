@@ -1,7 +1,7 @@
 // Disable no-unused-vars, broken for spread args
 import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron';
 
-export type Channels = 'ipc-example' | 'toggle-beacon';
+export type Channels = 'ipc-example' | 'toggle-beacon' | 'beacon-error';
 
 const electronHandler = {
   ipcRenderer: {

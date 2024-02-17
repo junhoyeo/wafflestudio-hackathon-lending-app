@@ -1,6 +1,7 @@
 import { PowerIcon, SearchXIcon, XIcon } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
 
 import { Classroom, ClassroomItem } from '@/components/ClassroomItem';
 import { ConfettiBackground } from '@/components/Confetti';
@@ -38,6 +39,9 @@ const Main: React.FC = () => {
     useState<boolean>(false);
 
   useEffect(() => {
+    window.electron.ipcRenderer.on('beacon-error', (err) => {
+      toast.error(err as string);
+    });
     window.electron.ipcRenderer.sendMessage(
       'toggle-beacon',
       isCurrentBeaconOn,
@@ -217,10 +221,25 @@ const Main: React.FC = () => {
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Main />} />
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Main />} />
+        </Routes>
+      </Router>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+    </>
   );
 }

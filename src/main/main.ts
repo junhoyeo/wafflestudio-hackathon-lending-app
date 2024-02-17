@@ -58,10 +58,12 @@ ipcMain.on('toggle-beacon', (event, isBeaconOn, classroom) => {
   } catch (e) {
     // alert with electron dialog
     console.error(e);
-    dialog.showErrorBox(
-      'Beacon operation failed',
-      (e as Error).message || 'Unknown error',
-    );
+    // dialog.showErrorBox(
+    //   'Beacon operation failed',
+    //   (e as Error).message || 'Unknown error',
+    // );
+    // send error to renderer process
+    event.reply('beacon-error', (e as Error).message || 'Unknown error');
   }
 });
 
