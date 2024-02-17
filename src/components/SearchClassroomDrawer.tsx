@@ -82,15 +82,13 @@ export const SearchClassroomDrawer: React.FC<SearchClassroomDrawerProps> = ({
         </div>
 
         <DrawerFooter>
-          <DrawerClose>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => setOpen(false)}
-            >
-              취소
-            </Button>
-          </DrawerClose>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => setOpen(false)}
+          >
+            취소
+          </Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
