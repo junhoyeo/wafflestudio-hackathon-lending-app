@@ -69,3 +69,8 @@
     --radius: 0.5rem;
   }
 }
+
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+}

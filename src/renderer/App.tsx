@@ -1,29 +1,42 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BedIcon, GraduationCapIcon } from 'lucide-react';
-import { Toggle } from '@/components/ui/toggle';
+import { GraduationCapIcon, PowerIcon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { cn } from '@/utils';
+import { Separator } from '@/components/ui/separator';
+
+import bananaCatCryingImage from '../../assets/banana-cat-crying.gif';
+import bananaCatBreathingImage from '../../assets/banana-cat-breathing.gif';
+import { Badge } from '@/components/ui/badge';
 
 type Classroom = {
   name: string;
 };
-type ClassroomItemProps = Classroom;
-export const ClassroomItem: React.FC<ClassroomItemProps> = ({ name }) => {
+type ClassroomItemProps = Classroom & {
+  className?: string;
+  onClick?: () => void;
+};
+export const ClassroomItem: React.FC<ClassroomItemProps> = ({
+  className,
+  name,
+  onClick,
+}) => {
   return (
     <li
       className={cn(
         'flex items-center gap-2 border border-solid border-slate-200 rounded-lg',
         'px-3 py-1.5 shadow-sm',
+        onClick &&
+          'cursor-pointer hover:bg-slate-100 transition-colors duration-200 ease-in-out',
+        className,
       )}
+      onClick={onClick}
     >
       <GraduationCapIcon className="text-slate-700" size={18} />
-      <span className="text-slate-700 font-medium tracking-tight">{name}</span>
+      <span className="font-medium tracking-tight text-slate-700">{name}</span>
     </li>
   );
 };
@@ -36,6 +49,10 @@ const MOCKED_RECENT_CLASSROOMS: Classroom[] = [
 
 function Hello() {
   const [isCurrentBeaconOn, setCurrentBeaconOn] = useState<boolean>(false);
+  const [currentClassroom, setCurrentClassroom] = useState<Classroom | null>(
+    // null,
+    { name: '301동 403호' },
+  );
   const [recentClassrooms] = useState<Classroom[]>(MOCKED_RECENT_CLASSROOMS);
 
   return (
@@ -47,17 +64,56 @@ function Hello() {
 
         <CardContent>
           <div className="flex flex-col gap-3">
-            <div className="flex items-center space-x-2">
-              <Label>전원</Label>
+            {currentClassroom && (
+              <>
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="flex flex-col items-center gap-2">
+                    <Badge className="w-fit">현재 강의실</Badge>
+                    <ClassroomItem {...currentClassroom} />
+                  </div>
+
+                  {isCurrentBeaconOn ? (
+                    <img
+                      className="w-[156px] h-[156px] rounded-md"
+                      alt="icon"
+                      src={bananaCatBreathingImage}
+                    />
+                  ) : (
+                    <img
+                      className="w-[156px] h-[156px] rounded-md"
+                      alt="icon"
+                      src={bananaCatCryingImage}
+                    />
+                  )}
+
+                  {isCurrentBeaconOn ? (
+                    <span>
+                      (현재 비컨이 <span className="font-bold">켜져</span>{' '}
+                      있어요.)
+                    </span>
+                  ) : (
+                    <span>
+                      (현재 비컨이 <span className="font-bold">꺼져</span>{' '}
+                      있어요.)
+                    </span>
+                  )}
+                </div>
+                <Separator />
+              </>
+            )}
+
+            <div className="flex items-center justify-center space-x-2">
+              <Label>
+                <span className="flex items-center gap-2">
+                  <PowerIcon size={18} />
+                  <span>전원</span>
+                </span>
+              </Label>
               <Switch
                 id="beacon-toggle"
                 onCheckedChange={() => setCurrentBeaconOn((p) => !p)}
               />
-              <Label htmlFor="beacon-toggle">
-                {isCurrentBeaconOn
-                  ? '(현재 비컨이 켜져 있어요.)'
-                  : '(현재 비컨이 꺼져 있어요.)'}
-              </Label>
+              <Label htmlFor="beacon-toggle"></Label>
             </div>
           </div>
         </CardContent>
@@ -69,8 +125,14 @@ function Hello() {
         </CardHeader>
         <CardContent>
           <ul className="flex flex-col gap-1">
-            {recentClassrooms.map((classroom, idx) => (
-              <ClassroomItem key={idx} {...classroom} />
+            {recentClassrooms.map((item, idx) => (
+              <ClassroomItem
+                key={idx}
+                {...item}
+                onClick={() => {
+                  setCurrentClassroom(item);
+                }}
+              />
             ))}
           </ul>
         </CardContent>
